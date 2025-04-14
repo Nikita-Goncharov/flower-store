@@ -1,0 +1,56 @@
+/* Orders.css */
+
+/* Контейнер навколо всього списку */
+.orders-container {
+    margin: 1rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Заголовок */
+  .orders-heading {
+    font-size: 26px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #2E7D32;
+  }
+  
+  /* Повідомлення про завантаження */
+  .orders-loading {
+    color: #555;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Повідомлення про помилку */
+  .orders-error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  /* Упорядкований або неупорядкований список замовлень */
+  .order-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Окремий блок замовлення */
+  .order-item {
+    display: flex;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 6px;
+    background-color: #f8f8f8;
+  }
+  
+  .order-item p {
+    margin: 5px 0;
+  }
+
+  .order-item img {
+    margin-right: 20px;
+  }

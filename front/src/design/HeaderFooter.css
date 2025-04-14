@@ -1,74 +1,85 @@
 .header {
-    background-color: #2E7D32; 
-    display: flex;
-    justify-content: center;
-    gap: 150px;
-    padding: 10px;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1;
-}
-  
-body {
-    padding-top: 60px;
+  background-color: #2E7D32;
+  display: flex;
+  justify-content: center;
+  gap: 150px;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999; /* щоб навісу було над усім */
 }
 
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  margin: 0 5px;
+}
 
-  .nav-link {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-  }
+.nav-link:hover {
+  text-decoration: underline;
+}
 
-  .nav-link:hover {
-    text-decoration: underline;
-  }
-  
-  .cart-link {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  
-  .cart-badge {
-    background-color: #4CAF50;
-    color: black;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: -8px;
-    right: -25px; 
-  }
+.cart-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 
-  .footer {
-    background-color: #2E7D32;
-    display: flex;
-    justify-content: center;
-    gap: 150px;
-    margin-top: 20px;
+.cart-badge {
+  background-color: #4CAF50;
+  color: black;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: -8px;
+  right: -25px;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.logout-btn:hover {
+  text-decoration: underline;
+}
+
+/* FOOTER */
+.footer {
+  background-color: #2E7D32;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 150px;
+  padding: 5px 10px;
 }
 
 .footer-links {
-    display: flex;
-    gap: 50px; 
+  display: flex;
+  gap: 50px;
 }
 
 .footer-link {
-    color: white;
-    text-decoration: none;
+  color: white;
+  text-decoration: none;
 }
 
 .footer-link:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .footer-address {
-    color: white;
+  color: white;
+  text-align: center;
 }

@@ -1,10 +1,15 @@
 // src/pages/Register.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
+
+import "../design/AuthForms.css";
 
 function Register() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { status, error } = useSelector((state) => state.auth);
 
   const [username, setUsername] = useState("");
@@ -17,24 +22,39 @@ function Register() {
   };
 
   return (
-    <div style={{ margin: "1rem" }}>
+    <div className="auth-container">
       <h2>Реєстрація</h2>
-      <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", maxWidth: 300 }}>
-        <label>Username:</label>
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        
-        <label>Email:</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} />
-        
-        <label>Password:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <form onSubmit={handleRegister} className="auth-form">
+        <label htmlFor="reg-username">Username:</label>
+        <input
+          id="reg-username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-        <button type="submit" disabled={status === "loading"}>Зареєструватися</button>
+        <label htmlFor="reg-email">Email:</label>
+        <input
+          id="reg-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <label htmlFor="reg-password">Password:</label>
+        <input
+          id="reg-password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button type="submit" disabled={status === "loading"}>
+          Зареєструватися
+        </button>
       </form>
 
       {status === "loading" && <p>Завантаження...</p>}
-      {error && <p style={{ color: "red" }}>Помилка: {error}</p>}
-      {status === "succeeded" && <p style={{ color: "green" }}>Реєстрація успішна!</p>}
+      {error && <p className="error-message">Помилка: {error}</p>}
     </div>
   );
 }

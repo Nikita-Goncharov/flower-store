@@ -15,13 +15,12 @@ export const fetchOrders = createAsyncThunk(
   }
 );
 
-// Створити нове замовлення
-// Тут ми очікуємо, що payload = { flowerName: string, quantity: number }
-// або можна передавати об'єкт cartItem, якщо ви будете робити POST /orders для кожного айтема
+// Створити нове замовлення (для одного товару)
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
   async ({ flowerName, quantity }, { rejectWithValue }) => {
     try {
+      // бекенд чекає поле flower_name
       const response = await api.post("/orders", {
         flower_name: flowerName,
         quantity,
@@ -58,7 +57,7 @@ const ordersSlice = createSlice({
       state.status = "succeeded";
       state.error = null;
       if (action.payload.success) {
-        state.list = action.payload.data; // масив замовлень
+        state.list = action.payload.data;
       } else {
         state.error = action.payload.message;
         state.list = [];

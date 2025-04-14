@@ -1,8 +1,8 @@
-// src/pages/Orders.js
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders } from "../redux/slices/ordersSlice";
 import { useNavigate } from "react-router-dom";
+import "../design/Orders.css";
 
 function Orders() {
   const dispatch = useDispatch();
@@ -19,28 +19,36 @@ function Orders() {
   }, [dispatch, navigate, isAuthenticated]);
 
   if (!isAuthenticated) {
-    return <p>Будь ласка, авторизуйтесь.</p>;
+    return <p className="orders-error">Будь ласка, авторизуйтесь.</p>;
   }
 
   return (
-    <div style={{ margin: "1rem" }}>
-      <h2>Ваші замовлення</h2>
-      {status === "loading" && <p>Завантаження...</p>}
-      {error && <p style={{ color: "red" }}>Помилка: {error}</p>}
+    <div className="orders-container">
+      <h2 className="orders-heading">Ваші замовлення</h2>
+
+      {status === "loading" && <p className="orders-loading">Завантаження...</p>}
+      {error && <p className="orders-error">Помилка: {error}</p>}
+
       {list.length === 0 && status === "succeeded" && (
-        <p>Немає замовлень.</p>
+        <p className="orders-loading">Немає замовлень.</p>
       )}
-      <ul>
+
+      <ul className="order-list">
         {list.map((order) => (
-          <li key={order.id} style={{ marginBottom: "1rem", border: "1px solid #ccc", padding: "0.5rem" }}>
-            <p>ID замовлення: {order.id}</p>
-            <p>Статус: {order.status}</p>
-            {order.flower && (
-              <p>
-                Квітка: {order.flower.name}, Ціна: {order.flower.price}, Тип: {order.flower.type}
-              </p>
-            )}
-            <p>Кількість: {order.quantity}</p>
+          <li key={order.id} className="order-item">
+            <img src={order.flower.img_link} alt="Flower img"/>
+            <div>
+              <p><strong>ID замовлення:</strong> {order.id}</p>
+              <p><strong>Статус:</strong> {order.status}</p>
+              {order.flower && (
+                <p>
+                  <strong>Квітка:</strong> {order.flower.name}, 
+                  <strong> Ціна:</strong> {order.flower.price} грн, 
+                  <strong> Тип:</strong> {order.flower.type}
+                </p>
+              )}
+              <p><strong>Кількість:</strong> {order.quantity}</p>
+            </div>
           </li>
         ))}
       </ul>

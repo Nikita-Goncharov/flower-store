@@ -1,8 +1,11 @@
 // src/pages/Login.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
+
+import "../design/AuthForms.css";
+
 
 function Login() {
   const dispatch = useDispatch();
@@ -12,9 +15,9 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  React.useEffect(() => {
+  // Якщо користувач вже авторизований – переходимо в каталог
+  useEffect(() => {
     if (isAuthenticated) {
-      // якщо логін успішний — переходимо на /catalog або на головну
       navigate("/catalog");
     }
   }, [isAuthenticated, navigate]);
@@ -25,18 +28,20 @@ function Login() {
   };
 
   return (
-    <div style={{ margin: "1rem" }}>
+    <div className="auth-container">
       <h2>Логін</h2>
-      <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", maxWidth: 300 }}>
-        <label>Email:</label>
+      <form onSubmit={handleLogin} className="auth-form">
+        <label htmlFor="login-email">Email:</label>
         <input
+          id="login-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label>Password:</label>
+        <label htmlFor="login-password">Password:</label>
         <input
+          id="login-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -48,7 +53,7 @@ function Login() {
       </form>
 
       {status === "loading" && <p>Завантаження...</p>}
-      {error && <p style={{ color: "red" }}>Помилка: {error}</p>}
+      {error && <p className="error-message">Помилка: {error}</p>}
     </div>
   );
 }
