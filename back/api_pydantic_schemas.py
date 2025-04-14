@@ -1,9 +1,6 @@
-from typing import Literal
-
 from pydantic import BaseModel, Field
-from tortoise.contrib.pydantic import pydantic_model_creator
 
-from models import User, Flower, Order
+from models import Flower, Order
 
 
 class UserRegister(BaseModel):
@@ -32,7 +29,6 @@ class OrderCreateResponse(BaseModel):
     
 UserLogoutResponse = OrderCreateResponse
 
-# UserSchema = pydantic_model_creator(User)
 
 class UserRegisterResponse(BaseModel):
     success: bool
