@@ -3,15 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Header, Response, status
 from tortoise.exceptions import DoesNotExist
 
-from models import init, Flower, Order, User
+from models import Flower, Order, User
 from api_pydantic_schemas import FlowerSchema, OrderSchema, OrderCreate, OrderCreateResponse, OrderGetResponse, FlowersGetResponse
 
 router = APIRouter()
-
-
-@router.on_event("startup")
-async def on_startup():
-    await init()
 
 
 @router.get("/flowers", response_model=FlowersGetResponse, status_code=status.HTTP_200_OK)
