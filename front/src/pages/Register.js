@@ -1,5 +1,5 @@
 // src/pages/Register.js
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
@@ -16,9 +16,10 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    dispatch(registerUser({ username, email, password }));
+    await dispatch(registerUser({ username, email, password }));
+    navigate("/login");
   };
 
   return (

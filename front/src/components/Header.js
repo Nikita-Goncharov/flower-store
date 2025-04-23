@@ -11,10 +11,9 @@ function Header({ cartItems = [] }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logoutUser()).then(() => {
-      navigate("/login");
-    });
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/login");
   };
 
   return (
