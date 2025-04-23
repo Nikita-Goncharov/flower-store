@@ -65,7 +65,7 @@ jobs:
             cd /home/ubuntu/flower-store
             git reset --hard HEAD
             git pull origin master
-            docker-compose down
-            docker-compose build
-            docker-compose up -d --remove-orphans
+            docker compose down
+            docker compose build
+            docker compose up -d --remove-orphans
           EOF
