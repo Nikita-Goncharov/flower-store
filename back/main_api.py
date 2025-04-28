@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Header, Response, status
 from tortoise.exceptions import DoesNotExist
 
-from models import Flower, Order, User
-from api_pydantic_schemas import FlowerSchema, OrderSchema, OrderCreate, OrderCreateResponse, OrderGetResponse, FlowersGetResponse
+from models import Flower, Order, User, Comment
+from api_pydantic_schemas import FlowerSchema, OrderSchema, OrderCreate, OrderCreateResponse, OrderGetResponse, FlowersGetResponse, CommentGetResponse, CommentSchema, CommentCreateResponse, CommentCreate
 
 router = APIRouter()
 
@@ -56,6 +56,39 @@ async def create_order(order_data: OrderCreate, token: Annotated[str | None, Hea
         except DoesNotExist:
             response.status_code = status.HTTP_403_FORBIDDEN
             return {"success": False, "message": "Error. There is no that flower."}
+    except DoesNotExist:
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return {"success": False, "message": "Error. Incorrect token."}
+
+
+
+@router.get("/comments", response_model=CommentGetResponse, status_code=status.HTTP_200_OK)
+async def get_comments(response: Response):
+    try:
+        comments = await Comment.all().prefetch_related("user")
+        comments_list = [
+            CommentSchema(
+                id=comment.id,
+                text=comment.text,
+                username=comment.user.username
+            ) for comment in comments
+        ]
+        return {"success": True, "data": comments_list, "message": ""}
+    except Exception as ex:
+        print(ex)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"success": False, "data": [], "message": "Error. Internal server error."}
+
+
+@router.post("/comments", response_model=CommentCreateResponse, status_code=status.HTTP_200_OK)
+async def create_comment(comment_data: CommentCreate, token: Annotated[str | None, Header()], response: Response):
+    try:
+        user = await User.get(token=token)
+        await Comment.create(
+            text=comment_data.text,
+            user=user,
+        )
+        return {"success": True, "message": ""}
     except DoesNotExist:
             response.status_code = status.HTTP_403_FORBIDDEN
             return {"success": False, "message": "Error. Incorrect token."}

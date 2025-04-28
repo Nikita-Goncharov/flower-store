@@ -28,6 +28,7 @@ class OrderCreateResponse(BaseModel):
     message: str
     
 UserLogoutResponse = OrderCreateResponse
+CommentCreateResponse = OrderCreateResponse
 
 
 class UserRegisterResponse(BaseModel):
@@ -59,3 +60,18 @@ class FlowersGetResponse(BaseModel):
     success: bool
     data: list[FlowerSchema]
     message: str
+
+
+class CommentSchema(BaseModel):
+    id: int
+    text: str
+    username: str
+
+class CommentGetResponse(BaseModel):
+    success: bool
+    data: list[CommentSchema]
+    message: str
+
+
+class CommentCreate(BaseModel):
+    text: str

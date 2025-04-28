@@ -47,6 +47,9 @@ class Flower(models.Model):
     type = fields.CharEnumField(enum_type=FlowerType, max_length=20, default=FlowerType.white)
     img_link = fields.CharField(default="", max_length=500)
     
+    created_at = fields.DatetimeField(auto_now_add=True)
+    modified_at = fields.DatetimeField(auto_now=True)
+    
     def __str__(self):
         return f"{self.name}({self.type}) - {self.price}"
 
@@ -63,8 +66,23 @@ class Order(models.Model):
     flower = fields.ForeignKeyField("models.Flower", related_name="orders")
     quantity = fields.IntField(default=1)
 
+    created_at = fields.DatetimeField(auto_now_add=True)
+    modified_at = fields.DatetimeField(auto_now=True)
+
     def __str__(self):
         return f"{self.user} - order_id: {self.id}"
+
+
+class Comment(models.Model):
+    id = fields.IntField(primary_key=True)
+    text = fields.TextField(default="")
+    user = fields.ForeignKeyField("models.User", related_name="comments")
+    
+    created_at = fields.DatetimeField(auto_now_add=True)
+    modified_at = fields.DatetimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.user} - comment text: {self.text}"
 
 config = {
     'connections': {

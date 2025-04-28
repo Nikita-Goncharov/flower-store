@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastadmin import TortoiseModelAdmin, register, action, WidgetType
 
-from models import User, Flower, Order
+from models import User, Flower, Order, Comment
 
 
 @register(User)
@@ -65,3 +65,11 @@ class OrderAdmin(TortoiseModelAdmin):
     list_display_links = ("id", "status")
     list_filter = ("id", "user", "flower")
     search_fields = ("user", "flower")
+    
+    
+@register(Comment)
+class CommentAdmin(TortoiseModelAdmin):
+    list_display = ("id", "text", "user")
+    list_display_links = ("id", "text")
+    list_filter = ("id", "user", "text")
+    search_fields = ("user", "text")
