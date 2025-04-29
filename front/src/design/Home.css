@@ -21,7 +21,7 @@
 
 .info-section {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .history-section h2, .why-choose-us h2, .testimonials h2 {
@@ -79,8 +79,37 @@
   .testimonials {
       align-items: center;
   }
+}
 
-  .testimonial blockquote {
-      max-width: 500px;
-  }
+.comment-form {
+  margin-top: 2rem;
+}
+
+.comment-textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+.comment-submit-button {
+  background-color: #4caf50;
+  color: white;
+  width: 100%;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.comment-submit-button:hover {
+  background-color: #45a049;
+}
+
+.comment-error {
+  color: red;
+  margin-top: 0.5rem;
 }

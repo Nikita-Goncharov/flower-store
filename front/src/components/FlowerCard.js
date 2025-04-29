@@ -1,12 +1,9 @@
-// src/components/FlowerCard.js
-
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createOrder } from "../redux/slices/ordersSlice";
 
 const FlowerCard = ({ flower, cartItems, setCartItems }) => {
-  // Якщо з бекенду дані про кольори не приходять – приберіть блок із select.
   const [selectedColor, setSelectedColor] = useState(
     flower.colors ? flower.colors[0] : "default"
   );
@@ -19,17 +16,12 @@ const FlowerCard = ({ flower, cartItems, setCartItems }) => {
     setSelectedColor(event.target.value);
   };
 
-  // 1) Додаємо товар у локальний кошик (якщо ви хочете, щоб користувач все одно бачив це в cart)
-  // 2) Якщо користувач авторизований – одразу виконуємо createOrder на бекенд
-  //    якщо ні – перенаправляємо на логін
   const handleAddToCartAndCreateOrder = async () => {
-    // Спочатку – якщо не авторизований, переходимо на login
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    // Додаємо у локальний state кошика (щоб зберігати фронтенд-стан, якщо потрібно)
     const existingItem = cartItems.find(
       (item) => item.id === flower.id && item.color === selectedColor
     );
@@ -57,25 +49,19 @@ const FlowerCard = ({ flower, cartItems, setCartItems }) => {
       ]);
     }
 
-    // Викликаємо createOrder, щоб відправити запит на бекенд
     try {
       const result = await dispatch(
         createOrder({
-          // Бекенд-сторона очікує поле flower_name
           flowerName: flower.name,
-          quantity: 1, // або збільшувати кількість, якщо потрібно
+          quantity: 1,
         })
       ).unwrap();
 
-      // Можна вивести повідомлення про успіх
       if (result.success) {
-        // Наприклад, console.log("Замовлення створено успішно!");
       } else {
-        // Якщо прийшло success: false
         alert("Не вдалося створити замовлення: " + result.message);
       }
     } catch (err) {
-      // Помилка від бекенду
       alert("Помилка при створенні замовлення: " + err);
     }
   };
@@ -107,7 +93,6 @@ const FlowerCard = ({ flower, cartItems, setCartItems }) => {
         </select>
       )}
 
-      {/* Тут змінюємо обробник на handleAddToCartAndCreateOrder */}
       <button onClick={handleAddToCartAndCreateOrder}>Купити</button>
     </div>
   );

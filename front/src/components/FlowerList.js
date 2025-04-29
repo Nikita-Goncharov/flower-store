@@ -1,4 +1,3 @@
-// src/components/FlowerList.js
 import React from "react";
 import FlowerCard from "./FlowerCard";
 

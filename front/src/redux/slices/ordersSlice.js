@@ -1,31 +1,27 @@
-// src/redux/slices/ordersSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
-// Отримати замовлення поточного користувача
 export const fetchOrders = createAsyncThunk(
   "orders/fetchOrders",
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/orders");
-      return response.data; // { success, data, message }
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Error fetching orders");
     }
   }
 );
 
-// Створити нове замовлення (для одного товару)
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
   async ({ flowerName, quantity }, { rejectWithValue }) => {
     try {
-      // бекенд чекає поле flower_name
       const response = await api.post("/orders", {
         flower_name: flowerName,
         quantity,
       });
-      return response.data; // { success, message }
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Error creating order");
     }
@@ -48,7 +44,6 @@ const ordersSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // FETCH ORDERS
     builder.addCase(fetchOrders.pending, (state) => {
       state.status = "loading";
       state.error = null;
@@ -69,7 +64,6 @@ const ordersSlice = createSlice({
       state.list = [];
     });
 
-    // CREATE ORDER
     builder.addCase(createOrder.pending, (state) => {
       state.createOrderStatus = "loading";
       state.createOrderError = null;

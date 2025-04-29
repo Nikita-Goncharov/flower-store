@@ -1,14 +1,12 @@
-// src/redux/slices/flowersSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
-// Отримання списку квітів
 export const fetchFlowers = createAsyncThunk(
   "flowers/fetchFlowers",
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/flowers");
-      return response.data; // { success, data, message }
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Error fetching flowers");
     }

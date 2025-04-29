@@ -7,7 +7,7 @@
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 999; /* щоб навісу було над усім */
+  z-index: 999;
 }
 
 .nav-link {
@@ -55,7 +55,6 @@
   text-decoration: underline;
 }
 
-/* FOOTER */
 .footer {
   background-color: #2E7D32;
   display: flex;

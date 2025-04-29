@@ -1,5 +1,3 @@
-// src/pages/Catalog.js
-
 import React, { useState, useEffect } from "react";
 import FlowerList from "../components/FlowerList";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,7 +15,6 @@ const Catalog = ({ cartItems, setCartItems }) => {
     dispatch(fetchFlowers());
   }, [dispatch]);
 
-  // Коли квіти завантажились
   useEffect(() => {
     setSortedFlowers(allFlowers);
   }, [allFlowers]);

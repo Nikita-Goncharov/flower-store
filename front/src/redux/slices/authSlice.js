@@ -1,8 +1,6 @@
-// src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
-// Реєстрація
 export const registerUser = createAsyncThunk(
   "auth/register",
   async ({ username, email, password }, { rejectWithValue }) => {
@@ -19,7 +17,6 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Логін
 export const loginUser = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
@@ -35,7 +32,6 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// Логаут
 export const logoutUser = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
   try {
     const response = await api.post("/logout");
@@ -50,19 +46,17 @@ const initialToken = localStorage.getItem("token") || "";
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    token: initialToken, // беремо з localStorage або ""  
+    token: initialToken,
     isAuthenticated: !!initialToken,
     status: null,
     error: null,
   },
   reducers: {
-    // додаткові ред’юсери, якщо треба
     resetError(state) {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
-    // REGISTER
     builder.addCase(registerUser.pending, (state) => {
       state.status = "loading";
       state.error = null;
@@ -76,7 +70,6 @@ const authSlice = createSlice({
       state.error = action.payload;
     });
 
-    // LOGIN
     builder.addCase(loginUser.pending, (state) => {
       state.status = "loading";
       state.error = null;
@@ -97,7 +90,6 @@ const authSlice = createSlice({
       state.error = action.payload;
     });
 
-    // LOGOUT
     builder.addCase(logoutUser.pending, (state) => {
       state.status = "loading";
       state.error = null;
@@ -106,12 +98,10 @@ const authSlice = createSlice({
       state.status = "succeeded";
       state.error = null;
       if (action.payload.success) {
-        // успішний логаут
         state.token = "";
         state.isAuthenticated = false;
         localStorage.removeItem("token");
       } else {
-        // якщо success = false, теж очищуємо (оскільки токен вже не валідний)
         state.token = "";
         state.isAuthenticated = false;
         localStorage.removeItem("token");
@@ -120,7 +110,6 @@ const authSlice = createSlice({
     builder.addCase(logoutUser.rejected, (state, action) => {
       state.status = "failed";
       state.error = action.payload;
-      // навіть при помилці логауту можна очищати токен
       state.token = "";
       state.isAuthenticated = false;
       localStorage.removeItem("token");

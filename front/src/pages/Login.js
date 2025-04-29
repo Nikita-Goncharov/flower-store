@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
@@ -15,7 +14,6 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Якщо користувач вже авторизований – переходимо в каталог
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/catalog");
