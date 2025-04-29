@@ -19,7 +19,7 @@ function Home() {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/comments");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments`);
       if (response.data.success) {
         setComments(response.data.data);
       } else {
@@ -40,7 +40,7 @@ function Home() {
 
     try {
       await axios.post(
-        "http://localhost:8000/comments",
+        `${process.env.REACT_APP_API_URL}/comments`,
         { text: newComment },
         {
           headers: {
