@@ -28,5 +28,5 @@ app.add_middleware(
 )
 
 app.mount("/admin", admin_app)
-app.include_router(auth_router)
-app.include_router(main_router)
+app.include_router(auth_router, prefix="/api")
+app.include_router(main_router, prefix="/api")
