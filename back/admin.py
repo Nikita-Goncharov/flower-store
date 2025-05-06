@@ -53,9 +53,9 @@ class UserAdmin(TortoiseModelAdmin):
 
 @register(Flower)
 class FlowerAdmin(TortoiseModelAdmin):
-    list_display = ("id", "name", "type", "price")
+    list_display = ("id", "name", "type", "category", "price")
     list_display_links = ("id", "name")
-    list_filter = ("id", "name", "type")
+    list_filter = ("id", "name", "type", "category")
     search_fields = ("name",)
 
 

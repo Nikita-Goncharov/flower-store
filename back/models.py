@@ -32,19 +32,31 @@ class User(models.Model):
 
 class Flower(models.Model):
     class FlowerType(str, Enum):
-        red = "red"
-        yellow = "yellow"
-        pink = "pink"
-        white = "white"
-        azure = "azure"
-        blue = "blue"
-        orange = "orange"
-        purple = "purple"
+        red = "Red"
+        yellow = "Yellow"
+        pink = "Pink"
+        white = "White"
+        azure = "Azure"
+        blue = "Blue"
+        orange = "Orange"
+        purple = "Purple"
     
+    class FlowerCategory(str, Enum):
+        birthday = "Birthday"
+        wedding = "Wedding"
+        love = "For a Loved One"
+        sympathy = "Sympathy / Funeral"
+        mom = "For Mom / Grandma"
+        colleague = "For Colleague / Boss"
+        man = "For Man / Boyfriend"
+        kids = "For Children"
+        universal = "Universal (Any Occasion)"
+
     id = fields.IntField(primary_key=True)
     name = fields.CharField(max_length=20, unique=True)
     price = fields.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     type = fields.CharEnumField(enum_type=FlowerType, max_length=20, default=FlowerType.white)
+    category = fields.CharEnumField(enum_type=FlowerCategory, max_length=50, default=FlowerCategory.universal)
     img_link = fields.CharField(default="", max_length=500)
     
     created_at = fields.DatetimeField(auto_now_add=True)
@@ -56,9 +68,9 @@ class Flower(models.Model):
 
 class Order(models.Model):
     class STATUSES(Enum):
-        pending = "pending"
-        completed = "completed"
-        failed = "failed"
+        pending = "Pending"
+        completed = "Completed"
+        failed = "Failed"
     
     id = fields.IntField(primary_key=True)
     status = fields.CharEnumField(STATUSES, max_length=20, default=STATUSES.pending)

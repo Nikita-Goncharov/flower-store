@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Header, Response, status
+from fastapi import APIRouter, Header, Response, status, Query
 from tortoise.exceptions import DoesNotExist
 
 from models import Flower, Order, User, Comment
@@ -8,11 +8,18 @@ from api_pydantic_schemas import FlowerSchema, OrderSchema, OrderCreate, OrderCr
 
 router = APIRouter()
 
-
 @router.get("/flowers", response_model=FlowersGetResponse, status_code=status.HTTP_200_OK)
-async def flowers():
-    flowers = await Flower.all().values()
-    return {"success": True, "data": [FlowerSchema.model_validate(f) for f in flowers], "message": ""}
+async def flowers(category: str | None = Query(default=None)):
+    if category:
+        flowers = await Flower.filter(category=category).values()
+    else:
+        flowers = await Flower.all().values()
+    
+    return {
+        "success": True,
+        "data": [FlowerSchema.model_validate(f) for f in flowers],
+        "message": ""
+    }
 
 
 @router.get("/orders", response_model=OrderGetResponse, status_code=status.HTTP_200_OK)
@@ -29,6 +36,7 @@ async def user_orders(token: Annotated[str | None, Header()], response: Response
                     name=order.flower.name,
                     price=order.flower.price,
                     type=order.flower.type,
+                    category=order.flower.category,
                     img_link=order.flower.img_link
                 ),
                 quantity=order.quantity

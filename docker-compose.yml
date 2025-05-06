@@ -12,7 +12,22 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/mydb
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ADMIN_USER_MODEL: ${ADMIN_USER_MODEL}
+      ADMIN_USER_MODEL_USERNAME_FIELD: ${ADMIN_USER_MODEL_USERNAME_FIELD}
+      ADMIN_SECRET_KEY: ${ADMIN_SECRET_KEY}
+      ADMIN_SITE_NAME: ${ADMIN_SITE_NAME}
+      ADMIN_SITE_SIGN_IN_LOGO: ${ADMIN_SITE_SIGN_IN_LOGO}
+      ADMIN_SITE_HEADER_LOGO: ${ADMIN_SITE_HEADER_LOGO}
+      ADMIN_SITE_FAVICON: ${ADMIN_SITE_FAVICON}
+      ADMIN_PRIMARY_COLOR: ${ADMIN_PRIMARY_COLOR}
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     volumes:
       - ./back:/app
     expose:

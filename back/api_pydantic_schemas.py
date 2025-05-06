@@ -40,6 +40,7 @@ class FlowerSchema(BaseModel):
     name: str
     price: float
     type: Flower.FlowerType
+    category: Flower.FlowerCategory
     img_link: str
     
 
