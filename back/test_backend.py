@@ -28,7 +28,7 @@ async def client():
 async def test_register_login_and_logout(client):
     # Test user registration
     resp = await client.post(
-        "/register",
+        "/api/register",
         json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
     )
     assert resp.status_code == 200
@@ -37,14 +37,14 @@ async def test_register_login_and_logout(client):
 
     # Test duplicate registration
     dup = await client.post(
-        "/register",
+        "/api/register",
         json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
     )
     assert dup.status_code == 409
 
     # Test login
     login = await client.post(
-        "/login",
+        "/api/login",
         json={"email": "test@example.com", "password": "secret123"},
     )
     assert login.status_code == 200
@@ -54,18 +54,18 @@ async def test_register_login_and_logout(client):
     assert token
 
     # Test logout
-    logout = await client.post("/logout", headers={"token": token})
+    logout = await client.post("/api/logout", headers={"token": token})
     assert logout.status_code == 200
     assert logout.json()["success"] is True
 
 
 @pytest.mark.asyncio
 async def test_flowers_and_orders_endpoints(client):
-    await Flower.create(name="Rose", price=10.50, type="red", img_link="/img/rose.png")
-    await Flower.create(name="Tulip", price=8.00, type="yellow", img_link="/img/tulip.png")
+    await Flower.create(name="Rose", price=10.50, type=Flower.FlowerType.red, category=Flower.FlowerCategory.birthday, img_link="/img/rose.png")
+    await Flower.create(name="Tulip", price=8.00, type=Flower.FlowerType.yellow, category=Flower.FlowerCategory.kids, img_link="/img/tulip.png")
 
     # Test GET /flowers
-    resp = await client.get("/flowers")
+    resp = await client.get("/api/flowers")
     assert resp.status_code == 200
     flowers_data = resp.json()
     assert flowers_data["success"] is True
@@ -74,28 +74,28 @@ async def test_flowers_and_orders_endpoints(client):
 
     # Register and login user
     await client.post(
-        "/register",
+        "/api/register",
         json={"username": "buyer", "email": "buyer@example.com", "password": "buy12345"},
     )
     login_resp = await client.post(
-        "/login",
+        "/api/login",
         json={"email": "buyer@example.com", "password": "buy12345"},
     )
     token = login_resp.json()["token"]
     headers = {"token": token}
 
     # Unauthorized access to /orders
-    no_auth = await client.get("/orders", headers={"token": "invalid token"})
+    no_auth = await client.get("/api/orders", headers={"token": "invalid token"})
     assert no_auth.status_code == 403
 
     # Empty orders list
-    empty_orders = await client.get("/orders", headers=headers)
+    empty_orders = await client.get("/api/orders", headers=headers)
     assert empty_orders.status_code == 200
     assert empty_orders.json()["data"] == []
 
     # Create order
     create_order = await client.post(
-        "/orders",
+        "/api/orders",
         headers=headers,
         json={"flower_name": "Rose", "quantity": 3},
     )
@@ -103,7 +103,7 @@ async def test_flowers_and_orders_endpoints(client):
     assert create_order.json()["success"] is True
 
     # Get orders
-    orders_list = await client.get("/orders", headers=headers)
+    orders_list = await client.get("/api/orders", headers=headers)
     assert orders_list.status_code == 200
     orders = orders_list.json()["data"]
     assert len(orders) == 1
@@ -112,7 +112,7 @@ async def test_flowers_and_orders_endpoints(client):
 
     # Invalid flower order
     bad_order = await client.post(
-        "/orders",
+        "/api/orders",
         headers=headers,
         json={"flower_name": "NonexistentFlower", "quantity": 1},
     )
