@@ -29,7 +29,7 @@ class OrderCreateResponse(BaseModel):
     
 UserLogoutResponse = OrderCreateResponse
 CommentCreateResponse = OrderCreateResponse
-
+OrdersUpdateStatusResponse = OrderCreateResponse
 
 class UserRegisterResponse(BaseModel):
     success: bool
@@ -76,3 +76,8 @@ class CommentGetResponse(BaseModel):
 
 class CommentCreate(BaseModel):
     text: str
+
+
+class OrdersUpdateStatus(BaseModel):
+    order_ids: list[int]
+    new_status: str

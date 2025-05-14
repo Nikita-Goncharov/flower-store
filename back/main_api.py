@@ -4,7 +4,7 @@ from fastapi import APIRouter, Header, Response, status, Query
 from tortoise.exceptions import DoesNotExist
 
 from models import Flower, Order, User, Comment
-from api_pydantic_schemas import FlowerSchema, OrderSchema, OrderCreate, OrderCreateResponse, OrderGetResponse, FlowersGetResponse, CommentGetResponse, CommentSchema, CommentCreateResponse, CommentCreate
+from api_pydantic_schemas import FlowerSchema, OrderSchema, OrderCreate, OrderCreateResponse, OrderGetResponse, FlowersGetResponse, CommentGetResponse, CommentSchema, CommentCreateResponse, CommentCreate, OrdersUpdateStatusResponse, OrdersUpdateStatus
 
 router = APIRouter()
 
@@ -68,6 +68,31 @@ async def create_order(order_data: OrderCreate, token: Annotated[str | None, Hea
             response.status_code = status.HTTP_403_FORBIDDEN
             return {"success": False, "message": "Error. Incorrect token."}
 
+
+@router.post("/update_orders_status", response_model=OrdersUpdateStatusResponse, status_code=status.HTTP_200_OK)
+async def update_orders_status(order_data: OrdersUpdateStatus, token: Annotated[str | None, Header()], response: Response):
+    try:
+        user = await User.get(token=token)
+        order_ids = order_data.order_ids
+        message = ""
+        
+        user_orders = await Order.filter(user=user, id__in=order_ids)
+        if len(user_orders) != len(order_ids):
+            message = "Warning. Not all orders was found"
+            
+        for order in user_orders:
+            if order_data.new_status == "completed":
+                order.status = Order.STATUSES.completed
+            elif order_data.new_status == "failed":
+                order.status = Order.STATUSES.failed
+            else:
+                pass # TODO: incorrect status
+            await order.save()
+
+        return {"success": True, "message": message}
+    except DoesNotExist:
+            response.status_code = status.HTTP_403_FORBIDDEN
+            return {"success": False, "message": "Error. Incorrect token."}
 
 
 @router.get("/comments", response_model=CommentGetResponse, status_code=status.HTTP_200_OK)
