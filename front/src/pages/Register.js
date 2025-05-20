@@ -23,7 +23,7 @@ function Register() {
 
   return (
     <div className="auth-container">
-      <h2>Реєстрація</h2>
+      <h2>Register</h2>
       <form onSubmit={handleRegister} className="auth-form">
         <label htmlFor="reg-username">Username:</label>
         <input
@@ -49,12 +49,12 @@ function Register() {
         />
 
         <button type="submit" disabled={status === "loading"}>
-          Зареєструватися
+        Sign up
         </button>
       </form>
 
-      {status === "loading" && <p>Завантаження...</p>}
-      {error && <p className="error-message">Помилка: {error}</p>}
+      {status === "loading" && <p>Loading...</p>}
+      {error && <p className="error-message">Error: {error}</p>}
     </div>
   );
 }

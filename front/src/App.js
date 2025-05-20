@@ -9,6 +9,9 @@ import Catalog from "./pages/Catalog";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Orders from "./pages/Orders";
+import PaymentSuccess from "./pages/PurchaseSuccessful";
+import PaymentFailed from "./pages/PurchaseFailed";
+
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -34,6 +37,8 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/successful" element={<PaymentSuccess />} />
+            <Route path="/failed" element={<PaymentFailed />} />
           </Routes>
         </main>
         <Footer />

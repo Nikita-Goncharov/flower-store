@@ -66,35 +66,35 @@ function Home() {
   return (
     <div className="home-container">
       <header className="home-header">
-        <h1>Ласкаво просимо до "Зелений Рай"</h1>
-        <p>Ми створюємо красу з любов'ю та турботою про наших клієнтів.</p>
+        <h1>Welcome to "Green Paradise"</h1>
+        <p>We create beauty with love and care for our customers.</p>
       </header>
 
       <section className="history-section">
-        <h2>Історія нашої компанії</h2>
+        <h2>History of our company</h2>
         <p>
-          "Зелений Рай" була заснована в 2010 році з метою надання високоякісних квітів та букетів для будь-яких подій.
-          Ми вирощуємо квіти у власних теплицях і постійно розширюємо асортимент, щоб кожен клієнт міг знайти ідеальний букет.
+        "Green Paradise" was founded in 2010 with the aim of providing high-quality flowers and bouquets for any event.
+        We grow flowers in our own greenhouses and are constantly expanding our range so that every client can find the perfect bouquet.
         </p>
         <p>
-          Наші флористи — справжні художники, які створюють унікальні композиції, що приносять радість та емоції.
+        Our florists are true artists who create unique compositions that bring joy and emotions.
         </p>
       </section>
 
       <section className="info-section">
         <div className="why-choose-us">
-          <h2>Чому обирають нас?</h2>
+          <h2>Why choose us?</h2>
           <div className="grid">
-            <div className="card">Якість: Тільки найкращі квіти.</div>
-            <div className="card">Унікальні букети: Ексклюзивні композиції.</div>
-            <div className="card">Доставка вчасно: Завжди у зазначений час.</div>
-            <div className="card">Зручний сервіс: Онлайн-замовлення.</div>
-            <div className="card">Підтримка клієнтів: Допомога та консультації.</div>
+            <div className="card">Quality: Only the best flowers.</div>
+            <div className="card">Unique bouquets: Exclusive compositions.</div>
+            <div className="card">On-time delivery: Always on time.</div>
+            <div className="card">Convenient service: Online ordering.</div>
+            <div className="card">Customer Support: Help and Advice.</div>
           </div>
         </div>
 
         <div className="testimonials">
-          <h2>Відгуки наших клієнтів</h2>
+          <h2>Our customers' reviews</h2>
 
           {comments.length > 0 ? (
             comments.map((comment) => (
@@ -106,22 +106,22 @@ function Home() {
               </div>
             ))
           ) : (
-            <p>Наразі немає відгуків.</p>
+            <p>There are currently no feedbacks.</p>
           )}
           {isAuthenticated && (
             <div className="comment-form">
-              <h3>Залишити відгук</h3>
+              <h3>Leave a feedback</h3>
               <form onSubmit={handleSubmit}>
                 <textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Ваш відгук..."
+                  placeholder="Your feedback..."
                   rows="4"
                   className="comment-textarea"
                   required
                 />
                 <button type="submit" className="comment-submit-button" disabled={loading}>
-                  {loading ? "Надсилання..." : "Надіслати"}
+                  {loading ? "Sending..." : "Send"}
                 </button>
               </form>
               {errorMessage && <p className="comment-error">{errorMessage}</p>}

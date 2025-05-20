@@ -27,7 +27,7 @@ function Login() {
 
   return (
     <div className="auth-container">
-      <h2>Логін</h2>
+      <h2>Login</h2>
       <form onSubmit={handleLogin} className="auth-form">
         <label htmlFor="login-email">Email:</label>
         <input
@@ -46,12 +46,12 @@ function Login() {
         />
 
         <button type="submit" disabled={status === "loading"}>
-          Увійти
+          Sign in
         </button>
       </form>
 
-      {status === "loading" && <p>Завантаження...</p>}
-      {error && <p className="error-message">Помилка: {error}</p>}
+      {status === "loading" && <p>Loading...</p>}
+      {error && <p className="error-message">Error: {error}</p>}
     </div>
   );
 }

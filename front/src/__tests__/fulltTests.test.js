@@ -170,9 +170,10 @@ describe('FlowerCard component', () => {
 
   it('redirects to login if not authenticated on buy', () => {
     useSelector.mockReturnValue(false);
-    renderWithStore(<FlowerCard flower={flower} cartItems={[]} setCartItems={() => {}} />);
-    fireEvent.click(screen.getByText(/Купити/i));
-    expect(mockedNavigate).toHaveBeenCalledWith('/login');
+    const buyFlowerCallback = jest.fn()
+    renderWithStore(<FlowerCard flower={flower} buyFlowerCallback={buyFlowerCallback}/>);
+    fireEvent.click(screen.getByText(/Buy/i));
+    expect(buyFlowerCallback).toHaveBeenCalled()
   });
 });
 
@@ -186,7 +187,7 @@ describe('Register page', () => {
     fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'u' } });
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'e' } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'p' } });
-    fireEvent.click(screen.getByRole('button', { name: /Зареєструватися/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }));
     expect(mockedDispatch).toHaveBeenCalled();
   });
 });
@@ -200,7 +201,7 @@ describe('Login page', () => {
     renderWithStore(<Login />);
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'e' } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'p' } });
-    fireEvent.click(screen.getByRole('button', { name: /Увійти/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
     expect(mockedDispatch).toHaveBeenCalled();
   });
 });

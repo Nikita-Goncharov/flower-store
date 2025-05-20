@@ -1,8 +1,9 @@
 .orders-container {
-    margin: 1rem;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "orders history-orders";
+    grid-gap: 20px;
   }
   
   .orders-heading {
@@ -24,17 +25,28 @@
     text-align: center;
   }
   
+  .amount {
+    text-align: center;
+  }
+
   .order-list {
+    grid-area: "orders";
+  }
+
+  .order-list ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
     list-style: none;
     padding: 0;
     margin: 0;
   }
   
   .order-item {
-    display: flex;
+    /* display: flex; */
     margin-bottom: 1rem;
     border: 1px solid #ccc;
-    padding: 1rem;
+    padding: 5px;
     border-radius: 6px;
     background-color: #f8f8f8;
   }
@@ -44,6 +56,69 @@
   }
 
   .order-item img {
-    width: 50%;
-    margin-right: 20px;
+    width: 100%;
+    margin-right: 20px; 
   }
+
+
+.order-history-list {
+  grid-area: "history-orders";
+  border-left: 2px solid #d4d4d4;
+  padding-left: 10px;
+}
+
+.order-history-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.order-history-item {
+  display: flex;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 6px;
+  background-color: #f8f8f8;
+}
+
+.order-history-item p {
+  margin: 5px 0;
+}
+
+.order-history-item img {
+  width: 50%;
+  margin-right: 20px;
+}
+
+
+/* Payment button */
+.wayforpay-button {
+  margin: auto;
+  display:inline-block!important;
+  background:#2B3160 url('https://wfpstorage.s3.eu-west-1.amazonaws.com/button/bg6x2.png') no-repeat center right;
+  background-size:cover;
+  width: 256px!important;
+  height:54px!important;
+  border:none!important;
+  border-radius:14px!important;
+  padding:16px!important;
+  text-decoration:none!important;
+  box-shadow:3px 2px 8px rgba(71,66,66,0.22)!important;
+  text-align:left!important;
+  box-sizing:border-box!important;
+}
+
+.wayforpay-button:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.wayforpay-button span {
+  font-family:Verdana,Arial,sans-serif!important;
+  font-weight:bold!important;
+  font-size:14px!important;
+  color:#ffffff!important;
+  line-height:18px!important;
+  vertical-align:middle!important;
+}

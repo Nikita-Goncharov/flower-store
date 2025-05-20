@@ -27,11 +27,11 @@ function Footer() {
           rel="noopener noreferrer"
           className="footer-link"
         >
-          Наш сайт
+          Our site
         </a>
       </div>
       <p className="footer-address">
-        Наша адреса: 61002, м.Харків, вул. Манізера, 4 (ст. Метро Архітектора Бекетова)
+      Our address: 61002, Kharkiv, Manizera St., 4 (Architectura Beketova Metro Station)
       </p>
     </footer>
   );

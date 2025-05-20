@@ -40,8 +40,14 @@ services:
       - backend
     environment:
       REACT_APP_API_URL: ${REACT_APP_API_URL}
+      WDS_SOCKET_PORT: ${WDS_SOCKET_PORT}  # to avoid: WebSocket connection to 'ws://localhost:3000/ws' failed: set this var as 0
+      REACT_APP_MERCHANT_ACCOUNT: ${REACT_APP_MERCHANT_ACCOUNT}
+      REACT_APP_MERCHANT_ACCOUNT_SECRET: ${REACT_APP_MERCHANT_ACCOUNT_SECRET}
+      REACT_APP_MERCHANT_DOMAIN_NAME: ${REACT_APP_MERCHANT_DOMAIN_NAME}
     expose:
       - "3000"
+    volumes:
+      - ./front:/app
     restart: always
 
   db:

@@ -1,15 +1,28 @@
 import React from "react";
 import FlowerCard from "./FlowerCard";
 
-const FlowerList = ({ flowers, cartItems, setCartItems }) => {
+const FlowerList = ({ flowers, buyFlowerCallback, gridCount = 4 }) => {
+  console.log(gridCount)
+  let width;
+  switch (gridCount) {
+    case 1:
+      width = "33%"
+      break
+    case 2:
+      width = "66%"
+      break
+    default:
+      width = "100%"
+      break
+  }
+  
   return (
-    <div className="flower-list">
+    <div className="flower-list" style={{"width": width, "gridTemplateColumns": `repeat(${gridCount}, 1fr)`}}>
       {flowers.map((flower) => (
         <FlowerCard
           key={flower.id}
           flower={flower}
-          cartItems={cartItems}
-          setCartItems={setCartItems}
+          buyFlowerCallback={buyFlowerCallback}
         />
       ))}
     </div>
