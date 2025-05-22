@@ -169,8 +169,8 @@ const Catalog = ({ cartItems, setCartItems }) => {
         </div>
       </div>
 
-      {status === "loading" && <p>Loading flowers...</p>}
-      {status === "failed" && <p>Error loading flowers.</p>}
+      {status === "flowers-loading" && <p>Loading flowers...</p>}
+      {status === "flowers-failed" && <p>Error loading flowers.</p>}
 
       {status === "succeeded" && (
         <>
@@ -189,11 +189,10 @@ const Catalog = ({ cartItems, setCartItems }) => {
               <button className="modal-end-purchase" onClick={closeModal}>End purchase</button>
             </div>
           </Modal>
-
-          <FlowerList
+          {sortedFlowers.length ? <FlowerList
             flowers={sortedFlowers}
             buyFlowerCallback={handleAddToCartAndCreateOrder}
-          />
+          /> : <p className="flowers-loading">There are no flowers yet</p>}
         </>
       )}
     </div>
