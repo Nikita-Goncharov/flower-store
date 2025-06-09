@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOrders } from "../redux/slices/ordersSlice";
+import { fetchOrders, changeOrderQuantity, deleteOrder, updateOrdersStatus } from "../redux/slices/ordersSlice";
 import { useNavigate } from "react-router-dom";
 import {HmacMD5} from "crypto-js"
 import Wayforpay from "../wayforpay"
@@ -28,19 +28,11 @@ function Orders() {
   const orderIds = []
   pendingOrders.forEach((order) => {
     productName.push(order.flower.name)
-    productPrice.push(order.flower.price)
+    productPrice.push(order.amount)
     productCount.push(order.quantity)
     orderIds.push(order.id)
   })
   const amount = productPrice.reduce((a, b) => a + b, 0)
-
-  const updateOrdersStatus = async (orderIdsList, status) => {
-    const response = await api.post("/update_orders_status", {
-      order_ids: orderIdsList,
-      new_status: status
-    });
-    return response
-  }
 
   const pay = () => {
     let response;
@@ -64,24 +56,17 @@ function Orders() {
         productPrice : productPrice,
         productCount : productCount,
         language: "EN",
-        // returnUrl
-        // serviceUrl
     },
     async (response) => {
         console.log(`Payment successful: ${response}`)
-        response = await updateOrdersStatus(orderIds, "completed")
-        console.log(response.data)
+        await dispatch(updateOrdersStatus({ orderIds, status: "completed" }))
         navigate("/successful")
     },
     async (response) => {
       console.log(`Payment failed: ${response}`)
-      response = await updateOrdersStatus(orderIds, "failed")
-      console.log(response.data)
+      await dispatch(updateOrdersStatus({ orderIds, status: "failed" }))
       navigate("/failed")
     }
-    // async (response) => {
-    //     // on pending or in processing
-    // }
     );
   }
 
@@ -107,11 +92,28 @@ function Orders() {
                 <p><strong>Status:</strong> {order.status}</p>
                 <p>
                   <strong>Flower:</strong> {order.flower.name}<br/>
-                  <strong>Price:</strong> {order.flower.price} uah<br/>
+                  <strong>Price:</strong> {order.amount} uah<br/>
                   <strong>Type:</strong> {order.flower.type}<br/>
                   <strong>Category:</strong> {order.flower.category}<br/>
                 </p>
-                <p><strong>Quantity:</strong> {order.quantity}</p>
+                <div className="order-manage-menu">
+                  <div className="quantity-menu">
+                    <button onClick={() => {
+                      dispatch(changeOrderQuantity({
+                        orderId: order.id,
+                        quantity: Math.max(1, order.quantity - 1)
+                      }))
+                      }}>-</button>
+                    <p>{order.quantity}</p>
+                    <button onClick={() => {
+                      dispatch(changeOrderQuantity({
+                        orderId: order.id,
+                        quantity: order.quantity + 1
+                      }))
+                      }}>+</button>
+                  </div>
+                  <button className="delete-order-btn" onClick={() => dispatch(deleteOrder(order.id))}>Delete</button>
+                </div>
               </div>
             </li>
           ))}
@@ -133,7 +135,7 @@ function Orders() {
                 <p><strong>Status:</strong> {order.status}</p>
                 <p>
                   <strong>Flower:</strong> {order.flower.name}<br/>
-                  <strong>Price:</strong> {order.flower.price} uah<br/>
+                  <strong>Price:</strong> {order.amount} uah<br/>
                   <strong>Type:</strong> {order.flower.type}<br/>
                   <strong>Category:</strong> {order.flower.category}<br/>
                 </p>

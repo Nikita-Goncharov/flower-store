@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from tortoise import Tortoise
-from models import Flower
+from models import Flower, Order
 from main import app
 
 
@@ -117,3 +117,93 @@ async def test_flowers_and_orders_endpoints(client):
         json={"flower_name": "NonexistentFlower", "quantity": 1},
     )
     assert bad_order.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_update_and_delete_order(client):
+    # Зареєструвати й увійти
+    await client.post("/api/register", json={
+        "username": "deleter",
+        "email": "deleter@example.com",
+        "password": "passdel123"
+    })
+    login_resp = await client.post("/api/login", json={
+        "email": "deleter@example.com",
+        "password": "passdel123"
+    })
+    token = login_resp.json()["token"]
+    headers = {"token": token}
+
+    # Створити квітку
+    await Flower.create(
+        name="Daisy",
+        price=5.50,
+        type=Flower.FlowerType.white,
+        category=Flower.FlowerCategory.love,
+        img_link="/img/daisy.png"
+    )
+
+    # Створити замовлення
+    create_order = await client.post(
+        "/api/orders",
+        headers=headers,
+        json={"flower_name": "Daisy", "quantity": 2},
+    )
+    assert create_order.status_code == 200
+    order = await Order.all().order_by("-id").first()
+    order_id = order.id
+
+    # Оновити замовлення — тільки кількість
+    update_quantity = await client.put(
+        f"/api/orders/{order_id}",
+        headers=headers,
+        json={"quantity": 5}
+    )
+    assert update_quantity.status_code == 200
+    updated_order = await Order.get(id=order_id)
+    assert updated_order.quantity == 5
+
+    # Оновити замовлення — тільки статус
+    update_status = await client.put(
+        f"/api/orders/{order_id}",
+        headers=headers,
+        json={"status": "Completed"}
+    )
+    assert update_status.status_code == 200
+    updated_order = await Order.get(id=order_id)
+    assert updated_order.status.value == "Completed"
+
+    # Оновити замовлення — кількість + статус
+    update_both = await client.put(
+        f"/api/orders/{order_id}",
+        headers=headers,
+        json={"quantity": 1, "status": "Failed"}
+    )
+    assert update_both.status_code == 200
+    updated_order = await Order.get(id=order_id)
+    assert updated_order.quantity == 1
+    assert updated_order.status.value == "Failed"
+
+    # Оновити неіснуюче замовлення
+    update_fail = await client.put(
+        "/api/orders/9999",
+        headers=headers,
+        json={"quantity": 3}
+    )
+    assert update_fail.status_code == 404
+
+    # Видалити замовлення
+    delete_resp = await client.delete(
+        f"/api/orders/{order_id}",
+        headers=headers
+    )
+    assert delete_resp.status_code == 200
+    assert delete_resp.json()["success"] is True
+
+    # Спроба видалити знову — не знайде
+    delete_again = await client.delete(
+        f"/api/orders/{order_id}",
+        headers=headers,
+    )
+    assert delete_again.status_code == 404
+    assert delete_again.json()["success"] is False

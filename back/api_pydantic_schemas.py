@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from models import Flower, Order
@@ -29,7 +31,12 @@ class OrderCreateResponse(BaseModel):
     
 UserLogoutResponse = OrderCreateResponse
 CommentCreateResponse = OrderCreateResponse
-OrdersUpdateStatusResponse = OrderCreateResponse
+OrderDeleteResponse = OrderCreateResponse
+
+class OrderUpdateData(BaseModel):
+    status: Optional[str] = None
+    quantity: Optional[int] = None
+
 
 class UserRegisterResponse(BaseModel):
     success: bool
@@ -47,6 +54,7 @@ class FlowerSchema(BaseModel):
 class OrderSchema(BaseModel):
     id: int
     status: Order.STATUSES
+    amount: float
     flower: FlowerSchema
     quantity: int
     
@@ -77,7 +85,3 @@ class CommentGetResponse(BaseModel):
 class CommentCreate(BaseModel):
     text: str
 
-
-class OrdersUpdateStatus(BaseModel):
-    order_ids: list[int]
-    new_status: str

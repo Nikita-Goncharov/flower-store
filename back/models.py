@@ -77,7 +77,7 @@ class Order(models.Model):
     user = fields.ForeignKeyField("models.User", related_name="orders")
     flower = fields.ForeignKeyField("models.Flower", related_name="orders")
     quantity = fields.IntField(default=1)
-
+    amount = fields.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     created_at = fields.DatetimeField(auto_now_add=True)
     modified_at = fields.DatetimeField(auto_now=True)
 

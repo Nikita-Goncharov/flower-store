@@ -125,3 +125,31 @@
   line-height:18px!important;
   vertical-align:middle!important;
 }
+
+.order-manage-menu {
+  display: flex;
+  justify-content: space-around;
+}
+
+.order-manage-menu .delete-order-btn {
+  border: none;
+  background-color: #e93737;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.order-manage-menu .quantity-menu {
+  border: #ccc solid 1px;
+  padding: 5px;
+  border-radius: 10px;
+  display: flex;
+}
+
+.order-manage-menu .quantity-menu > * {
+  margin: 0 7px;
+}
+
+.order-manage-menu .quantity-menu button {
+  background-color: transparent;
+  border: none;
+}

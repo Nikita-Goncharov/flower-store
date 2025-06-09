@@ -28,6 +28,50 @@ export const createOrder = createAsyncThunk(
   }
 );
 
+export const changeOrderQuantity = createAsyncThunk(
+  "orders/changeOrderQuantity",
+  async ({ orderId, quantity }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/orders/${orderId}`, {
+        quantity,
+      });
+      return { orderId, quantity };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Error updating quantity");
+    }
+  }
+);
+
+export const deleteOrder = createAsyncThunk(
+  "orders/deleteOrder",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      await api.delete(`/orders/${orderId}`);
+      return orderId;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Error deleting order");
+    }
+  }
+);
+
+
+export const updateOrdersStatus = createAsyncThunk(
+  "orders/updateStatus",
+  async ({ orderIds, status }, { rejectWithValue }) => {
+    try {
+      const responses = await Promise.all(
+        orderIds.map((id) =>
+          api.put(`/orders/${id}`, { status })
+        )
+      );
+      return responses.map(res => res.data);
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Unknown error");
+    }
+  }
+);
+
+
 const ordersSlice = createSlice({
   name: "orders",
   initialState: {
@@ -79,6 +123,29 @@ const ordersSlice = createSlice({
     builder.addCase(createOrder.rejected, (state, action) => {
       state.createOrderStatus = "failed";
       state.createOrderError = action.payload;
+    });
+    builder.addCase(changeOrderQuantity.fulfilled, (state, action) => {
+      const { orderId, quantity } = action.payload;
+      const order = state.list.find(o => o.id === orderId);
+      if (order) {
+        order.amount = order.flower.price * quantity
+        order.quantity = quantity;
+      }
+    });
+    builder.addCase(deleteOrder.fulfilled, (state, action) => {
+      const orderId = action.payload;
+      state.list = state.list.filter(order => order.id !== orderId);
+    });
+    builder.addCase(updateOrdersStatus.pending, (state) => {
+      state.status = "loading";
+      state.error = null;
+    })
+    builder.addCase(updateOrdersStatus.fulfilled, (state) => {
+      state.status = "succeeded";
+    })
+    builder.addCase(updateOrdersStatus.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload;
     });
   },
 });
