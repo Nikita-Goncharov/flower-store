@@ -21,17 +21,21 @@ class UserLoginResponse(BaseModel):
     token: str = Field()
     message: str
 
+
 class OrderCreate(BaseModel):
     flower_name: str
     quantity: int
 
+
 class OrderCreateResponse(BaseModel):
     success: bool
     message: str
-    
+
+
 UserLogoutResponse = OrderCreateResponse
 CommentCreateResponse = OrderCreateResponse
 OrderDeleteResponse = OrderCreateResponse
+
 
 class OrderUpdateData(BaseModel):
     status: Optional[str] = None
@@ -42,6 +46,7 @@ class UserRegisterResponse(BaseModel):
     success: bool
     message: str
 
+
 class FlowerSchema(BaseModel):
     id: int
     name: str
@@ -49,7 +54,7 @@ class FlowerSchema(BaseModel):
     type: Flower.FlowerType
     category: Flower.FlowerCategory
     img_link: str
-    
+
 
 class OrderSchema(BaseModel):
     id: int
@@ -57,13 +62,13 @@ class OrderSchema(BaseModel):
     amount: float
     flower: FlowerSchema
     quantity: int
-    
-    
+
+
 class OrderGetResponse(BaseModel):
     success: bool
     data: list[OrderSchema]
     message: str
-    
+
 
 class FlowersGetResponse(BaseModel):
     success: bool
@@ -76,6 +81,7 @@ class CommentSchema(BaseModel):
     text: str
     username: str
 
+
 class CommentGetResponse(BaseModel):
     success: bool
     data: list[CommentSchema]
@@ -84,4 +90,3 @@ class CommentGetResponse(BaseModel):
 
 class CommentCreate(BaseModel):
     text: str
-

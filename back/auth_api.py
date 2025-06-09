@@ -4,20 +4,20 @@ import bcrypt
 from fastapi import APIRouter, Header, Response, status
 from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError
 
+from api_pydantic_schemas import UserLogin, UserLoginResponse, UserLogoutResponse, UserRegister, UserRegisterResponse
 from models import User
-from api_pydantic_schemas import UserRegister, UserLogin, UserLoginResponse, UserLogoutResponse, UserRegisterResponse
 
 router = APIRouter()
 
 
 @router.post("/register", response_model=UserRegisterResponse, status_code=status.HTTP_200_OK)
 async def register(user: UserRegister, response: Response):
-    try:    
+    try:
         # Hash the password before saving
         hashed_password = bcrypt.hashpw(user.password.encode(), bcrypt.gensalt()).decode()
 
         try:
-            user_obj = await User.create(
+            await User.create(
                 username=user.username,
                 email=user.email,
                 password_hash=hashed_password,  # Save hashed password

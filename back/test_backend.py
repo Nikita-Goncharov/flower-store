@@ -1,17 +1,15 @@
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 from tortoise import Tortoise
-from models import Flower, Order
+
 from main import app
+from models import Flower, Order
 
 
 @pytest_asyncio.fixture(scope="module", autouse=True)
 async def initialize_db():
-    await Tortoise.init(
-        db_url="sqlite://:memory:",
-        modules={"models": ["models"]}
-    )
+    await Tortoise.init(db_url="sqlite://:memory:", modules={"models": ["models"]})
     await Tortoise.generate_schemas()
     yield
     await Tortoise._drop_databases()
@@ -61,8 +59,20 @@ async def test_register_login_and_logout(client):
 
 @pytest.mark.asyncio
 async def test_flowers_and_orders_endpoints(client):
-    await Flower.create(name="Rose", price=10.50, type=Flower.FlowerType.red, category=Flower.FlowerCategory.birthday, img_link="/img/rose.png")
-    await Flower.create(name="Tulip", price=8.00, type=Flower.FlowerType.yellow, category=Flower.FlowerCategory.kids, img_link="/img/tulip.png")
+    await Flower.create(
+        name="Rose",
+        price=10.50,
+        type=Flower.FlowerType.red,
+        category=Flower.FlowerCategory.birthday,
+        img_link="/img/rose.png",
+    )
+    await Flower.create(
+        name="Tulip",
+        price=8.00,
+        type=Flower.FlowerType.yellow,
+        category=Flower.FlowerCategory.kids,
+        img_link="/img/tulip.png",
+    )
 
     # Test GET /flowers
     resp = await client.get("/api/flowers")
@@ -122,15 +132,10 @@ async def test_flowers_and_orders_endpoints(client):
 @pytest.mark.asyncio
 async def test_update_and_delete_order(client):
     # Зареєструвати й увійти
-    await client.post("/api/register", json={
-        "username": "deleter",
-        "email": "deleter@example.com",
-        "password": "passdel123"
-    })
-    login_resp = await client.post("/api/login", json={
-        "email": "deleter@example.com",
-        "password": "passdel123"
-    })
+    await client.post(
+        "/api/register", json={"username": "deleter", "email": "deleter@example.com", "password": "passdel123"}
+    )
+    login_resp = await client.post("/api/login", json={"email": "deleter@example.com", "password": "passdel123"})
     token = login_resp.json()["token"]
     headers = {"token": token}
 
@@ -140,7 +145,7 @@ async def test_update_and_delete_order(client):
         price=5.50,
         type=Flower.FlowerType.white,
         category=Flower.FlowerCategory.love,
-        img_link="/img/daisy.png"
+        img_link="/img/daisy.png",
     )
 
     # Створити замовлення
@@ -154,49 +159,30 @@ async def test_update_and_delete_order(client):
     order_id = order.id
 
     # Оновити замовлення — тільки кількість
-    update_quantity = await client.put(
-        f"/api/orders/{order_id}",
-        headers=headers,
-        json={"quantity": 5}
-    )
+    update_quantity = await client.put(f"/api/orders/{order_id}", headers=headers, json={"quantity": 5})
     assert update_quantity.status_code == 200
     updated_order = await Order.get(id=order_id)
     assert updated_order.quantity == 5
 
     # Оновити замовлення — тільки статус
-    update_status = await client.put(
-        f"/api/orders/{order_id}",
-        headers=headers,
-        json={"status": "Completed"}
-    )
+    update_status = await client.put(f"/api/orders/{order_id}", headers=headers, json={"status": "Completed"})
     assert update_status.status_code == 200
     updated_order = await Order.get(id=order_id)
     assert updated_order.status.value == "Completed"
 
     # Оновити замовлення — кількість + статус
-    update_both = await client.put(
-        f"/api/orders/{order_id}",
-        headers=headers,
-        json={"quantity": 1, "status": "Failed"}
-    )
+    update_both = await client.put(f"/api/orders/{order_id}", headers=headers, json={"quantity": 1, "status": "Failed"})
     assert update_both.status_code == 200
     updated_order = await Order.get(id=order_id)
     assert updated_order.quantity == 1
     assert updated_order.status.value == "Failed"
 
     # Оновити неіснуюче замовлення
-    update_fail = await client.put(
-        "/api/orders/9999",
-        headers=headers,
-        json={"quantity": 3}
-    )
+    update_fail = await client.put("/api/orders/9999", headers=headers, json={"quantity": 3})
     assert update_fail.status_code == 404
 
     # Видалити замовлення
-    delete_resp = await client.delete(
-        f"/api/orders/{order_id}",
-        headers=headers
-    )
+    delete_resp = await client.delete(f"/api/orders/{order_id}", headers=headers)
     assert delete_resp.status_code == 200
     assert delete_resp.json()["success"] is True
 
