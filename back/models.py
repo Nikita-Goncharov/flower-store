@@ -97,34 +97,10 @@ class Comment(models.Model):
         return f"{self.user} - comment text: {self.text}"
 
 
-config = {
-    'connections': {
-        'default': {
-            'engine': 'tortoise.backends.asyncpg',
-            'credentials': {
-                'host': 'db',
-                'port': 5432,
-                'user': 'postgres',
-                'password': 'password',
-                'database': 'flower_store',
-                'minsize': 1,
-                'maxsize': 1000,
-            },
-        }
-    },
-    'apps': {
-        'models': {
-            'models': ['models', 'aerich.models'],
-            'default_connection': 'default',
-        }
-    },
-    'use_tz': False,
-    'timezone': 'Asia/Shanghai',
-}
-
+config = project_config.db_config
 
 async def init():
-    await Tortoise.init(config=config)
+    await Tortoise.init(config=project_config.db_config)
     await User.get_or_create(
         username=project_config.ADMIN_NAME,
         defaults={
