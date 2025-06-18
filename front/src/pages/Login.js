@@ -51,7 +51,7 @@ function Login() {
       </form>
 
       {status === "loading" && <p>Loading...</p>}
-      {error && <p className="error-message">Error: {error}</p>}
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 }
