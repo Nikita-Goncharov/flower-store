@@ -64,7 +64,7 @@ export const updateOrdersStatus = createAsyncThunk(
           api.put(`/orders/${id}`, { status })
         )
       );
-      return responses.map(res => res.data);
+      return status
     } catch (err) {
       return rejectWithValue(err.response?.data || "Unknown error");
     }
