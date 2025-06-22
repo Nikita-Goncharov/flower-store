@@ -59,12 +59,12 @@ function Orders() {
     },
     async (response) => {
         console.log(`Payment successful: ${response}`)
-        await dispatch(updateOrdersStatus({ orderIds, status: "completed" }))
+        await dispatch(updateOrdersStatus({ orderIds, status: "Completed" }))
         navigate("/successful")
     },
     async (response) => {
       console.log(`Payment failed: ${response}`)
-      await dispatch(updateOrdersStatus({ orderIds, status: "failed" }))
+      await dispatch(updateOrdersStatus({ orderIds, status: "Failed" }))
       navigate("/failed")
     }
     );
