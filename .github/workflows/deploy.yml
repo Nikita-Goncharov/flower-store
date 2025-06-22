@@ -23,7 +23,7 @@ jobs:
 
       - name: Run FastAPI tests
         working-directory: ./back
-        run: pytest
+        run: python -m unittest test_backend.py 
 
   test-frontend:
     runs-on: ubuntu-latest

@@ -1,195 +1,169 @@
-import pytest
-import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
+import unittest
+from httpx import AsyncClient
+from httpx._transports.asgi import ASGITransport
 from tortoise import Tortoise
-
-from main import app
+from main import app  # або де саме в тебе FastAPI app
 from models import Flower, Order
 
+class BaseTestCase(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
+        await Tortoise.init(
+            db_url="sqlite://:memory:",
+            modules={"models": ["models"]}
+        )
+        await Tortoise.generate_schemas()
+        self.transport = ASGITransport(app=app)
+        self.client = AsyncClient(transport=self.transport, base_url="http://test")
 
-@pytest_asyncio.fixture(scope="module", autouse=True)
-async def initialize_db():
-    await Tortoise.init(db_url="sqlite://:memory:", modules={"models": ["models"]})
-    await Tortoise.generate_schemas()
-    yield
-    await Tortoise._drop_databases()
-
-
-@pytest_asyncio.fixture
-async def client():
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-
-
-@pytest.mark.asyncio
-async def test_register_login_and_logout(client):
-    # Test user registration
-    resp = await client.post(
-        "/api/register",
-        json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
-    )
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["success"] is True
-
-    # Test duplicate registration
-    dup = await client.post(
-        "/api/register",
-        json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
-    )
-    assert dup.status_code == 409
-
-    # Test login
-    login = await client.post(
-        "/api/login",
-        json={"email": "test@example.com", "password": "secret123"},
-    )
-    assert login.status_code == 200
-    login_data = login.json()
-    assert login_data["success"] is True
-    token = login_data["token"]
-    assert token
-
-    # Test logout
-    logout = await client.post("/api/logout", headers={"token": token})
-    assert logout.status_code == 200
-    assert logout.json()["success"] is True
+    async def asyncTearDown(self):
+        await self.client.aclose()
+        await Tortoise._drop_databases()
 
 
-@pytest.mark.asyncio
-async def test_flowers_and_orders_endpoints(client):
-    await Flower.create(
-        name="Rose",
-        price=10.50,
-        type=Flower.FlowerType.red,
-        category=Flower.FlowerCategory.birthday,
-        img_link="/img/rose.png",
-    )
-    await Flower.create(
-        name="Tulip",
-        price=8.00,
-        type=Flower.FlowerType.yellow,
-        category=Flower.FlowerCategory.kids,
-        img_link="/img/tulip.png",
-    )
+class TestAuth(BaseTestCase):
 
-    # Test GET /flowers
-    resp = await client.get("/api/flowers")
-    assert resp.status_code == 200
-    flowers_data = resp.json()
-    assert flowers_data["success"] is True
-    assert len(flowers_data["data"]) == 2
-    assert {f["name"] for f in flowers_data["data"]} == {"Rose", "Tulip"}
+    async def test_register_login_and_logout(self):
+        # Register
+        resp = await self.client.post(
+            "/api/register",
+            json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.json()["success"])
 
-    # Register and login user
-    await client.post(
-        "/api/register",
-        json={"username": "buyer", "email": "buyer@example.com", "password": "buy12345"},
-    )
-    login_resp = await client.post(
-        "/api/login",
-        json={"email": "buyer@example.com", "password": "buy12345"},
-    )
-    token = login_resp.json()["token"]
-    headers = {"token": token}
+        # Duplicate register
+        dup = await self.client.post(
+            "/api/register",
+            json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
+        )
+        self.assertEqual(dup.status_code, 409)
 
-    # Unauthorized access to /orders
-    no_auth = await client.get("/api/orders", headers={"token": "invalid token"})
-    assert no_auth.status_code == 403
+        # Login
+        login = await self.client.post(
+            "/api/login",
+            json={"email": "test@example.com", "password": "secret123"},
+        )
+        self.assertEqual(login.status_code, 200)
+        token = login.json().get("token")
+        self.assertTrue(token)
 
-    # Empty orders list
-    empty_orders = await client.get("/api/orders", headers=headers)
-    assert empty_orders.status_code == 200
-    assert empty_orders.json()["data"] == []
-
-    # Create order
-    create_order = await client.post(
-        "/api/orders",
-        headers=headers,
-        json={"flower_name": "Rose", "quantity": 3},
-    )
-    assert create_order.status_code == 200
-    assert create_order.json()["success"] is True
-
-    # Get orders
-    orders_list = await client.get("/api/orders", headers=headers)
-    assert orders_list.status_code == 200
-    orders = orders_list.json()["data"]
-    assert len(orders) == 1
-    assert orders[0]["flower"]["name"] == "Rose"
-    assert orders[0]["quantity"] == 3
-
-    # Invalid flower order
-    bad_order = await client.post(
-        "/api/orders",
-        headers=headers,
-        json={"flower_name": "NonexistentFlower", "quantity": 1},
-    )
-    assert bad_order.status_code == 403
+        # Logout
+        logout = await self.client.post("/api/logout", headers={"token": token})
+        self.assertEqual(logout.status_code, 200)
+        self.assertTrue(logout.json()["success"])
 
 
-@pytest.mark.asyncio
-async def test_update_and_delete_order(client):
-    # Зареєструвати й увійти
-    await client.post(
-        "/api/register", json={"username": "deleter", "email": "deleter@example.com", "password": "passdel123"}
-    )
-    login_resp = await client.post("/api/login", json={"email": "deleter@example.com", "password": "passdel123"})
-    token = login_resp.json()["token"]
-    headers = {"token": token}
+class TestFlowersAndOrders(BaseTestCase):
 
-    # Створити квітку
-    await Flower.create(
-        name="Daisy",
-        price=5.50,
-        type=Flower.FlowerType.white,
-        category=Flower.FlowerCategory.love,
-        img_link="/img/daisy.png",
-    )
+    async def test_flowers_and_orders_endpoints(self):
+        await Flower.create(name="Rose", price=10.50, type=Flower.FlowerType.red, category=Flower.FlowerCategory.birthday, img_link="/img/rose.png")
+        await Flower.create(name="Tulip", price=8.00, type=Flower.FlowerType.yellow, category=Flower.FlowerCategory.kids, img_link="/img/tulip.png")
 
-    # Створити замовлення
-    create_order = await client.post(
-        "/api/orders",
-        headers=headers,
-        json={"flower_name": "Daisy", "quantity": 2},
-    )
-    assert create_order.status_code == 200
-    order = await Order.all().order_by("-id").first()
-    order_id = order.id
+        # Get flowers
+        resp = await self.client.get("/api/flowers")
+        self.assertEqual(resp.status_code, 200)
+        flowers = resp.json()["data"]
+        self.assertEqual(len(flowers), 2)
+        self.assertSetEqual({f["name"] for f in flowers}, {"Rose", "Tulip"})
 
-    # Оновити замовлення — тільки кількість
-    update_quantity = await client.put(f"/api/orders/{order_id}", headers=headers, json={"quantity": 5})
-    assert update_quantity.status_code == 200
-    updated_order = await Order.get(id=order_id)
-    assert updated_order.quantity == 5
+        # Register & login
+        await self.client.post("/api/register", json={
+            "username": "buyer", "email": "buyer@example.com", "password": "buy12345"
+        })
+        login = await self.client.post("/api/login", json={
+            "email": "buyer@example.com", "password": "buy12345"
+        })
+        token = login.json()["token"]
+        headers = {"token": token}
 
-    # Оновити замовлення — тільки статус
-    update_status = await client.put(f"/api/orders/{order_id}", headers=headers, json={"status": "Completed"})
-    assert update_status.status_code == 200
-    updated_order = await Order.get(id=order_id)
-    assert updated_order.status.value == "Completed"
+        # Unauthorized access
+        bad = await self.client.get("/api/orders", headers={"token": "badtoken"})
+        self.assertEqual(bad.status_code, 403)
 
-    # Оновити замовлення — кількість + статус
-    update_both = await client.put(f"/api/orders/{order_id}", headers=headers, json={"quantity": 1, "status": "Failed"})
-    assert update_both.status_code == 200
-    updated_order = await Order.get(id=order_id)
-    assert updated_order.quantity == 1
-    assert updated_order.status.value == "Failed"
+        # Empty orders
+        empty = await self.client.get("/api/orders", headers=headers)
+        self.assertEqual(empty.status_code, 200)
+        self.assertEqual(empty.json()["data"], [])
 
-    # Оновити неіснуюче замовлення
-    update_fail = await client.put("/api/orders/9999", headers=headers, json={"quantity": 3})
-    assert update_fail.status_code == 404
+        # Create order
+        create = await self.client.post("/api/orders", headers=headers, json={
+            "flower_name": "Rose", "quantity": 3
+        })
+        self.assertEqual(create.status_code, 200)
+        self.assertTrue(create.json()["success"])
 
-    # Видалити замовлення
-    delete_resp = await client.delete(f"/api/orders/{order_id}", headers=headers)
-    assert delete_resp.status_code == 200
-    assert delete_resp.json()["success"] is True
+        # Get orders
+        orders = await self.client.get("/api/orders", headers=headers)
+        data = orders.json()["data"]
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["flower"]["name"], "Rose")
+        self.assertEqual(data[0]["quantity"], 3)
 
-    # Спроба видалити знову — не знайде
-    delete_again = await client.delete(
-        f"/api/orders/{order_id}",
-        headers=headers,
-    )
-    assert delete_again.status_code == 404
-    assert delete_again.json()["success"] is False
+        # Invalid flower order
+        bad_order = await self.client.post("/api/orders", headers=headers, json={
+            "flower_name": "NonexistentFlower", "quantity": 1
+        })
+        self.assertEqual(bad_order.status_code, 403)
+
+
+class TestOrderUpdateDelete(BaseTestCase):
+
+    async def test_update_and_delete_order(self):
+        await self.client.post("/api/register", json={
+            "username": "deleter",
+            "email": "deleter@example.com",
+            "password": "passdel123"
+        })
+        login = await self.client.post("/api/login", json={
+            "email": "deleter@example.com",
+            "password": "passdel123"
+        })
+        token = login.json()["token"]
+        headers = {"token": token}
+
+        await Flower.create(
+            name="Daisy", price=5.50, type=Flower.FlowerType.white,
+            category=Flower.FlowerCategory.love, img_link="/img/daisy.png"
+        )
+
+        # Create order
+        await self.client.post("/api/orders", headers=headers, json={
+            "flower_name": "Daisy", "quantity": 2
+        })
+        order = await Order.all().order_by("-id").first()
+        order_id = order.id
+
+        # Update quantity
+        res1 = await self.client.put(f"/api/orders/{order_id}", headers=headers, json={"quantity": 5})
+        self.assertEqual(res1.status_code, 200)
+        self.assertEqual((await Order.get(id=order_id)).quantity, 5)
+
+        # Update status
+        res2 = await self.client.put(f"/api/orders/{order_id}", headers=headers, json={"status": "Completed"})
+        self.assertEqual(res2.status_code, 200)
+        self.assertEqual((await Order.get(id=order_id)).status.value, "Completed")
+
+        # Update both
+        res3 = await self.client.put(f"/api/orders/{order_id}", headers=headers, json={"quantity": 1, "status": "Failed"})
+        self.assertEqual(res3.status_code, 200)
+        updated = await Order.get(id=order_id)
+        self.assertEqual(updated.quantity, 1)
+        self.assertEqual(updated.status.value, "Failed")
+
+        # Update non-existent
+        res4 = await self.client.put("/api/orders/9999", headers=headers, json={"quantity": 3})
+        self.assertEqual(res4.status_code, 404)
+
+        # Delete
+        res5 = await self.client.delete(f"/api/orders/{order_id}", headers=headers)
+        self.assertEqual(res5.status_code, 200)
+        self.assertTrue(res5.json()["success"])
+
+        # Delete again
+        res6 = await self.client.delete(f"/api/orders/{order_id}", headers=headers)
+        self.assertEqual(res6.status_code, 404)
+        self.assertFalse(res6.json()["success"])
+
+
+if __name__ == "__main__":
+    unittest.main()
