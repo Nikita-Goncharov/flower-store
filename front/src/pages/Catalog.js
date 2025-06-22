@@ -25,7 +25,7 @@ const customStyles = {
 
 Modal.setAppElement('#root');
 
-const Catalog = ({ cartItems, setCartItems }) => {
+const Catalog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortedFlowers, setSortedFlowers] = useState([]);
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -65,28 +65,6 @@ const Catalog = ({ cartItems, setCartItems }) => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
-    }
-
-    const existingItem = cartItems.find((item) => item.id === flower.id);
-    if (existingItem) {
-      setCartItems(
-        cartItems.map((item) =>
-          item.id === flower.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
-    } else {
-      setCartItems([
-        ...cartItems,
-        {
-          id: flower.id,
-          name: flower.name,
-          price: flower.price,
-          quantity: 1,
-          image: flower.img_link,
-        },
-      ]);
     }
 
     try {

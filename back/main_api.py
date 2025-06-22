@@ -70,11 +70,12 @@ async def create_order(order_data: OrderCreate, token: Annotated[str | None, Hea
         try:
             flower = await Flower.get(name=order_data.flower_name)
             user_old_orders = await Order.filter(user=user, flower=flower)
-            if user_old_orders:
-                user_old_order = user_old_orders[0]
-                user_old_order.quantity += 1
-                user_old_order.amount = user_old_order.quantity * flower.price
-                await user_old_order.save()
+            user_old_pending_orders = [order for order in user_old_orders if order.status == "Pending"]
+            if user_old_pending_orders:
+                user_old_pending_order = user_old_pending_orders[0]
+                user_old_pending_order.quantity += 1
+                user_old_pending_order.amount = user_old_pending_order.quantity * flower.price
+                await user_old_pending_order.save()
             else:
                 await Order.create(
                     user=user, flower=flower, quantity=order_data.quantity, amount=order_data.quantity * flower.price

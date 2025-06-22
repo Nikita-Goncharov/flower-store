@@ -4,7 +4,7 @@ import "../design/HeaderFooter.css";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/slices/authSlice";
 
-function Header({ cartItems = [] }) {
+function Header() {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();

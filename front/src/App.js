@@ -14,25 +14,16 @@ import PaymentFailed from "./pages/PurchaseFailed";
 
 
 function App() {
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem("cartItems");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
-
   return (
     <Router>
       <div className="app">
-        <Header cartItems={cartItems} />
+        <Header />
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route
               path="/catalog"
-              element={<Catalog cartItems={cartItems} setCartItems={setCartItems} />}
+              element={<Catalog />}
             />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
