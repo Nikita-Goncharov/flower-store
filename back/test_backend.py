@@ -1,9 +1,12 @@
 import unittest
+
 from httpx import AsyncClient
 from httpx._transports.asgi import ASGITransport
 from tortoise import Tortoise
+
 from main import app  # або де саме в тебе FastAPI app
 from models import Flower, Order
+from testing_utils import user_data_generator
 
 class BaseTestCase(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
@@ -14,6 +17,7 @@ class BaseTestCase(unittest.IsolatedAsyncioTestCase):
         await Tortoise.generate_schemas()
         self.transport = ASGITransport(app=app)
         self.client = AsyncClient(transport=self.transport, base_url="http://test")
+        self.user_gen = user_data_generator()
 
     async def asyncTearDown(self):
         await self.client.aclose()
@@ -23,10 +27,11 @@ class BaseTestCase(unittest.IsolatedAsyncioTestCase):
 class TestAuth(BaseTestCase):
 
     async def test_register_login_and_logout(self):
+        username, email, password = next(self.user_gen)
         # Register
         resp = await self.client.post(
             "/api/register",
-            json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
+            json={"username": username, "email": email, "password": password},
         )
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json()["success"])
@@ -34,14 +39,14 @@ class TestAuth(BaseTestCase):
         # Duplicate register
         dup = await self.client.post(
             "/api/register",
-            json={"username": "testuser", "email": "test@example.com", "password": "secret123"},
+            json={"username": username, "email": email, "password": password},
         )
         self.assertEqual(dup.status_code, 409)
 
         # Login
         login = await self.client.post(
             "/api/login",
-            json={"email": "test@example.com", "password": "secret123"},
+            json={"email": email, "password": password},
         )
         self.assertEqual(login.status_code, 200)
         token = login.json().get("token")
@@ -67,11 +72,12 @@ class TestFlowersAndOrders(BaseTestCase):
         self.assertSetEqual({f["name"] for f in flowers}, {"Rose", "Tulip"})
 
         # Register & login
+        username, email, password = next(self.user_gen)
         await self.client.post("/api/register", json={
-            "username": "buyer", "email": "buyer@example.com", "password": "buy12345"
+            "username": username, "email": email, "password": password
         })
         login = await self.client.post("/api/login", json={
-            "email": "buyer@example.com", "password": "buy12345"
+            "email": email, "password": password
         })
         token = login.json()["token"]
         headers = {"token": token}
@@ -109,14 +115,15 @@ class TestFlowersAndOrders(BaseTestCase):
 class TestOrderUpdateDelete(BaseTestCase):
 
     async def test_update_and_delete_order(self):
+        username, email, password = next(self.user_gen)
         await self.client.post("/api/register", json={
-            "username": "deleter",
-            "email": "deleter@example.com",
-            "password": "passdel123"
+            "username": username,
+            "email": email,
+            "password": password
         })
         login = await self.client.post("/api/login", json={
-            "email": "deleter@example.com",
-            "password": "passdel123"
+            "email": email,
+            "password": password
         })
         token = login.json()["token"]
         headers = {"token": token}
